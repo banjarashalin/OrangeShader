@@ -1,0 +1,95 @@
+#Orange.rib
+# Defining attributes for calculating raytracing shadow #
+Attribute "visibility" "trace" [1] "int diffuse" [1] "int specular" [1] "int transmission" [1]
+Attribute "trace" "int samplemotion" [100] "int displacements" [1] "bias" [0.05] "int maxspeculardepth" [2] "int maxdiffusedepth" [1]
+
+# Defining output format and file name #
+
+Display "Orange.tiff" "file" "rgb"
+
+# Defining attribute for displacemnet #
+
+Attribute "displacementbound" "sphere" [0.3] "coordinatesystem" ["shader"]
+
+# Defining rendering attributes #
+
+	Format 1280 720 1
+    ShadingRate 0.6
+    PixelSamples 3 3
+    PixelFilter "sinc" 3 3
+
+# Defining Camera projection #
+
+Projection "perspective" "fov" [ 30 ]
+
+# Defining Light sources for the scene #
+
+LightSource "ambientlight" 1
+			"intensity" [0.015]
+
+LightSource "pointlight" 2
+			"from" [5 5 -3]
+			"intensity" [30]
+
+LightSource "shadowspot" 3 
+			"shadowname" ["raytrace"]
+			"from" [-5 8 -5 ] 
+			"to" [0.5 -1.2 9.5] 
+			"intensity" [100]
+			"coneangle" [0.185]
+			"conedeltaangle" [0.09]
+			"float samples" [30]
+			"float width" [64]
+
+# Transling the world back by 7 units on z axis #
+
+Translate 0 0 7
+
+# Creating the world space #
+
+WorldBegin
+
+# Creating dept of field #
+
+Atmosphere "depthfade" "maxdistance" [12]
+
+# Creating the base plane #
+
+TransformBegin
+AttributeBegin
+Attribute "visibility" "trace" [1] "int diffuse" [1] "int specular" [1] "int transmission" [1]
+Attribute "trace" "int samplemotion" [100] "int displacements" [1] "bias" [0.05] "int maxspeculardepth" [2] "int maxdiffusedepth" [1]
+	Surface "wood"
+	Patch "bilinear" "P" [-5 -1 -5
+						   -5 -1 5
+						   5 -1 -5
+						    5 -1 5]
+AttributeEnd
+TransformEnd
+
+# Creating the front Orange #
+
+TransformBegin
+AttributeBegin
+	#1 Meter
+	Translate -0.5 0.1 -1
+	Rotate 55 1 0.2 0
+	Displacement "OrangeDisplace"
+	Surface "Orange"
+	Sphere 1 -1 1 360
+AttributeEnd
+TransformEnd
+
+# Creating the back Orange #
+
+TransformBegin
+AttributeBegin
+	#5 Meters
+	Translate 1.5 0.1 1.2
+	Rotate -55 1 0.2 0
+	Displacement "OrangeDisplace"
+	Surface "Orange"
+	Sphere 1 -1 1 360
+AttributeEnd
+TransformEnd
+WorldEnd
